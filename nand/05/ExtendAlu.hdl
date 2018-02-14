@@ -1,0 +1,51 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/ExtendAlu.hdl
+
+/**
+* The input of the extends ALU is instruction[9] and x[16],y[16].
+* the output is define as follows:
+* If instruction[7..8] equals 1 the the output is exactly as the ALU.
+* Where instruction[5]=zx,instruction[4]=nx,...,instruction[0]=no.
+* If instruction[7] equals 0 the output will be x*y and disregard the rest 
+* of the instruction.
+*
+* If instruction[8] equals 0 the output will be shift.
+* Then, if instruction[4] equals 0 it will return shift of y otherwise shift 
+* of x, moreover if instruction[5] equals 0 it will return shift right 
+* otherwise shift left.
+**/
+CHIP ExtendAlu{
+     IN x[16],y[16],instruction[9];
+     OUT out[16],zr,ng;
+     
+     PARTS:
+	// compute if instruction[7..8] == 11
+	ALU (x=x, y=y, zx=instruction[5], nx=instruction[4], zy=instruction[3], ny=instruction[2], f=instruction[1], no=instruction[0], out=xalu);
+    
+	// compute if instruction[7..8] == X0
+	Mul (a=x, b=y, out=xmuly);
+	
+	// compute if instruction[7..8] == 0X
+	ShiftRight (in=x, out=xshiftright);    // ShiftRight x
+	ShiftRight (in=y, out=yshiftright);    // ShiftRight y
+	ShiftLeft (in=x, out=xshiftleft);      // ShiftLeft x
+	ShiftLeft (in=y, out=yshiftleft);      // ShiftLeft y
+	
+	Mux16 (a=yshiftright, b=xshiftright, sel=instruction[4], out=tempright);
+	Mux16 (a=yshiftleft, b=xshiftleft, sel=instruction[4], out=templeft);
+	Mux16 (a=tempright, b=templeft, sel=instruction[5], out=shift);
+	Mux4Way16 (a=xmuly, b=shift, c=xmuly, d=xalu, sel=instruction[7..8], out=out, out[0..7]=part1, out[8..15]=part2, out[15]=sign);
+	
+    // check if out == 0 or not 
+    Or8Way (in=part1, out=temp1);
+    Or8Way (in=part2, out=temp2);
+    Or (a=temp1, b=temp2, out=temp3);
+   
+    // if (out == 0) set zr = 1
+    Not (in=temp3, out=zr);
+   
+    // if (out < 0) set ng = 1
+    Mux (a=false, b=true, sel=sign, out=ng);
+}

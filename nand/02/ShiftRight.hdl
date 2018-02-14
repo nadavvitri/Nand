@@ -1,0 +1,17 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/ShiftRight.hdl
+
+/**
+ * the chip will divide by 2 its input
+ */
+ 
+CHIP ShiftRight{
+     IN in[16];
+     OUT out[16];
+     
+     PARTS:
+	 Or (a=false, b=in[15], out=sign);  // compute sign of number
+	 Or16 (a[15]=sign, a[0..14]=false, b[15]=false, b[0..14]=in[1..15], out=out);
+}

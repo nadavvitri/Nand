@@ -1,0 +1,110 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */ 
+class Memory {
+	
+	static Array ram;
+	static int first_free_list;
+	static int last_free_list;
+	
+    /** Initializes the class. */
+    function void init() {
+		let ram = 0;
+		let first_free_list = 2048;
+		let last_free_list = 2048;
+		let ram[2048] = 0;
+		let ram[2049] = 14335;
+		return;
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+		return ram[address];
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+		let ram[address] = value;
+		return;
+    }
+
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address. */
+    function int alloc(int size) {
+		var int i, other_fit, prev_i, temp;
+		var boolean flag_fit;
+		let i = first_free_list;
+		let flag_fit = false;
+		let prev_i = i;
+		while(~(ram[i] = 0)){
+			// best fit
+			if(ram[i + 1] = (size + 2)){
+				//update next of the node
+				let ram[prev_i] = ram[i];
+				let ram[i] = 0;
+				let ram[i + 1] = size;
+				// the case we take the first node
+				if (i = first_free_list){
+					let first_free_list = ram[i];
+				}
+				return i + 2;
+			}
+			// other fit
+			if (ram[i + 1] >  (size + 2)){
+				if (~(flag_fit)){
+					let other_fit = i;
+					let flag_fit = true;
+				}
+				if (flag_fit & (ram[other_fit + 1] > ram[i + 1])){
+					let other_fit = i;
+				}
+				
+			}
+			let prev_i = i;
+			let i = ram[i];
+		}
+		// check if the last node is have best fit
+		if(ram[i + 1] = (size + 2)){
+				let ram[prev_i] = ram[i]; // 0
+				let ram[i] = 0;
+				let ram[i + 1] = size;
+				let last_free_list = prev_i;
+				return i + 2;
+			}
+			// case that all nodes was to small form the (size + 2) and now check the last one
+		if (~(flag_fit) & (ram[i + 1] > (size + 2))){
+			// cut from the end
+			let temp = i + ram[i + 1] - size;
+			let ram[i + 1] = ram[i + 1] - size - 2;
+			let ram[temp - 1] = size;
+			let ram[temp - 2] = 0;
+			return temp;
+		}
+		if (ram[other_fit + 1] < ram[i + 1]){
+				let other_fit = i;
+			}
+		let temp = other_fit + ram[other_fit + 1] - size;
+		let ram[other_fit + 1] = ram[other_fit + 1] - size - 2;
+		let ram[temp - 1] = size;
+		let ram[temp - 2] = 0;
+		return temp;
+    }
+
+
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array o) {
+		let ram[last_free_list] = o - 2;
+		let last_free_list = o - 2;
+		return;
+    }    
+}

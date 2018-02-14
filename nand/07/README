@@ -1,0 +1,25 @@
+nadav.vitri, arie.shtine
+===============================================================================
+Nadav Vitri, ID 203819909, nadav.vitri@mail.huji.ac.il
+Arie Shtine, ID 204616122, arie.shtine@mail.huji.ac.il
+===============================================================================
+
+                           Project 7 - Virtual Machine (Arithmetic)
+                           ----------------------- 
+  
+
+Submitted Files
+---------------
+README - This file.
+VMtranslator.py - The main file that runs the program.
+Parse.py - maintain the parsing of line.
+Translating.py - translate parts.
+Makefile - Make file for the program.
+Assembler - Bash file.
+
+Remarks
+-------
+* We read the vm file line by line and sending line for parsing,
+there we also send every part to be translate in translating unit.
+After parsing and translating line we write the asm line in the
+output file (filename.asm).

@@ -1,0 +1,18 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/ShiftLeft.hdl
+
+/**
+ * the chip will multiply by 2 its input
+ */
+ 
+CHIP ShiftLeft{
+     IN in[16];
+     OUT out[16];
+     
+     PARTS:
+	 Or (a=false, b=in[15], out=sign);  // compute sign of number
+	 Or16 (a=false, b[15]=sign, b[14]=in[13], b[13]=in[12], b[12]=in[11], b[11]=in[10],b[10]=in[9], b[9]=in[8], 
+	 b[8]=in[7], b[7]=in[6], b[6]=in[5], b[5]=in[4],b[4]=in[3], b[3]=in[2], b[2]=in[1], b[1]=in[0], b[0]=false, out=out);
+}

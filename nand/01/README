@@ -1,0 +1,34 @@
+nadav.vitri, arie.shtine
+===============================================================================
+Nadav Vitri, ID 203819909, nadav.vitri@mail.huji.ac.il
+Arie Shtine, ID 204616122, arie.shtine@mail.huji.ac.il
+===============================================================================
+
+                           Project 1 - Boolean Logic
+                           ----------------------- 
+  
+
+Submitted Files
+---------------
+README - This file.
+Not.hdl - The chip for Not.
+And.hdl - The chip for And.
+Or.hdl - The chip for OR table.
+Xor.hdl - The chip for XOR table.
+Mux.hdl - Multiplexor.
+DMux.hdl - Demultiplexor.
+Not16.hdl - 16-bit Not.
+And16.hdl - 16-bit And. 
+Or16.hdl - 16-bit bitwise Or.
+Mux16.hdl - 16-bit multiplexor.
+Or8Way.hdl - 8-way Or chip.
+Mux4Way16.hdl - 4-way 16-bit multiplexor.
+Mux8Way16.hdl - 8-way 16-bit multiplexor.
+DMux4Way.hdl - 4-way demultiplexor.
+DMux8Way.hdl - 8-way demultiplexor.
+
+Remarks
+-------
+* We bulid the chips in the order appears here (and recommend in the lecture).
+The basic chip (Not) bulid from Nand chip. then we bulid the other chips with
+the previous.

@@ -1,0 +1,65 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/Mul.hdl
+
+/**
+ * out = a * b
+ */
+ 
+CHIP Mul{
+    IN a[16], b[16];
+    OUT out[16];
+
+    PARTS:
+	// Like long decimal multiplication, multiply b[i] * a (e.g, if b[i] == 1 so we multiply 16-bit 1 with a)
+	Mux16 (a=false, b=true, sel=b[0], out=trueOrFalse0);   // makes 16-bit number that every bit equal to b[i]
+	And16 (a=a, b=trueOrFalse0, out=temp0);
+	Mux16 (a=false, b=true, sel=b[1], out=trueOrFalse1);
+	And16 (a=a, b=trueOrFalse1, out[0..14]=temp1);
+	Mux16 (a=false, b=true, sel=b[2], out=trueOrFalse2);
+	And16 (a=a, b=trueOrFalse2, out[0..13]=temp2);
+	Mux16 (a=false, b=true, sel=b[3], out=trueOrFalse3);
+	And16 (a=a, b=trueOrFalse3, out[0..12]=temp3);
+	Mux16 (a=false, b=true, sel=b[4], out=trueOrFalse4);
+	And16 (a=a, b=trueOrFalse4, out[0..11]=temp4);
+	Mux16 (a=false, b=true, sel=b[5], out=trueOrFalse5);
+	And16 (a=a, b=trueOrFalse5, out[0..10]=temp5);
+	Mux16 (a=false, b=true, sel=b[6], out=trueOrFalse6);
+	And16 (a=a, b=trueOrFalse6, out[0..9]=temp6);
+	Mux16 (a=false, b=true, sel=b[7], out=trueOrFalse7);
+	And16 (a=a, b=trueOrFalse7, out[0..8]=temp7);
+	Mux16 (a=false, b=true, sel=b[8], out=trueOrFalse8);
+	And16 (a=a, b=trueOrFalse8, out[0..7]=temp8);
+	Mux16 (a=false, b=true, sel=b[9], out=trueOrFalse9);
+	And16 (a=a, b=trueOrFalse9, out[0..6]=temp9);
+	Mux16 (a=false, b=true, sel=b[10], out=trueOrFalse10);
+	And16 (a=a, b=trueOrFalse10, out[0..5]=temp10);
+	Mux16 (a=false, b=true, sel=b[11], out=trueOrFalse11);
+	And16 (a=a, b=trueOrFalse11, out[0..4]=temp11);
+	Mux16 (a=false, b=true, sel=b[12], out=trueOrFalse12);
+	And16 (a=a, b=trueOrFalse12, out[0..3]=temp12);
+	Mux16 (a=false, b=true, sel=b[13], out=trueOrFalse13);
+	And16 (a=a, b=trueOrFalse13, out[0..2]=temp13);
+	Mux16 (a=false, b=true, sel=b[14], out=trueOrFalse14);
+	And16 (a=a, b=trueOrFalse14, out[0..1]=temp14);
+	Mux16 (a=false, b=true, sel=b[15], out=trueOrFalse15);
+	And16 (a=a, b=trueOrFalse15, out[0]=temp15);
+	
+	// insert 0 in the blank bits and compute the 16 results
+	Add16 (a=temp0, b[0]=false, b[1..15]=temp1, out=add1);
+	Add16 (a[0..1]=false, a[2..15]=temp2, b[0..2]=false ,b[3..15]=temp3, out=add2);
+	Add16 (a[0..3]=false, a[4..15]=temp4, b[0..4]=false ,b[5..15]=temp5, out=add3);
+	Add16 (a[0..5]=false, a[6..15]=temp6, b[0..6]=false ,b[7..15]=temp7, out=add4);
+	Add16 (a[0..7]=false, a[8..15]=temp8, b[0..8]=false ,b[9..15]=temp9, out=add5);
+	Add16 (a[0..9]=false, a[10..15]=temp10, b[0..10]=false ,b[11..15]=temp11, out=add6);
+	Add16 (a[0..11]=false, a[12..15]=temp12, b[0..12]=false ,b[13..15]=temp13, out=add7);
+	Add16 (a[0..13]=false, a[14..15]=temp14, b[0..14]=false ,b[15]=temp15, out=add8);
+	Add16 (a=add1, b=add2, out=c);
+	Add16 (a=add3, b=add4, out=d);	
+	Add16 (a=add5, b=add6, out=e);
+	Add16 (a=add7, b=add8, out=f);
+	Add16 (a=c, b=d, out=c1);
+	Add16 (a=e, b=f, out=c2);
+	Add16 (a=c1, b=c2, out=out);
+}

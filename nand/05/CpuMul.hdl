@@ -1,0 +1,70 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/CpuMul.hdl
+
+/**
+* This chip is an extension of the book CPU by using the extended ALU.
+* More specificly if instruction[15]==0 or (instruction[14] and instruction[13] equals 1)
+* the CpuMul behave exactly as the book CPU.
+* While if it is C instruction and instruction[13] == 0 the output will be D*A/M 
+* (according to instruction[12]).
+* Moreover, if it is c instruction and instruction[14] == 0 it will behave as follows:
+*
+* instruction:  | 12 | 11 | 10 |
+* _____________________________
+* shift left D  | 0  | 1  | 1  |
+* shift left A  | 0  | 1  | 0  |
+* shift left M  | 1  | 1  | 0  |
+* shift right D | 0  | 0  | 1  |
+* shift right A | 0  | 0  | 0  |
+* shift right M | 1  | 0  | 0  |
+**/
+
+CHIP CpuMul{
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset=1) or continue executing
+                         // the current program (reset=0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write into M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+     PARTS:
+	And (a=instruction[15], b=true, out=Cinstruction);  // type of instructions
+	Not (in=Cinstruction, out=Ainstruction);
+	
+	// Mux choose instructions if this A instruction, else is C instruction and feeds with ALU output
+    Mux16 (a=instruction, b=ALUout, sel=Cinstruction, out=Aregin);
+	
+	And (a=Cinstruction, b=instruction[5], out=Cinsdest1); 
+	Or (a=Cinsdest1, b=Ainstruction, out=loadA);
+	ARegister (in=Aregin, load=loadA, out=Aregout, out[0..14]=addressM); // A register
+	
+	And (a=Cinstruction, b=instruction[4], out=loadD);
+	DRegister (in=ALUout, load=loadD, out=ALUsrc1);  // D register
+	
+	And (a=Cinstruction, b=instruction[3], out=writeM);
+	
+	Mux16 (a=Aregout, b=inM, sel=instruction[12], out=ALUsrc2);
+	
+	ExtendAlu (x=ALUsrc1, y=ALUsrc2, instruction=instruction[6..14], out=ALUout, out=outM, zr=zero, ng=neg);
+	
+	// calculate the load for PC according to the jump bits and ALU control output's
+	And (a=neg, b=instruction[2], out=jlt);  // jump if negetive
+	And (a=zero, b=instruction[1], out=jeq);  // jump if zero
+	
+	Or (a=neg, b=zero, out=zeroOrNeg);  // zero or negetive means out <= 0
+	Not (in=zeroOrNeg, out=pos);  // out > 0 
+	And (a=pos, b=instruction[0], out=jgt);  // jump if positive
+	
+	Or (a=jlt, b=jeq, out=temp);
+	Or (a=temp, b=jgt, out=jump);  // jump appear (and the bits) and stand in the condition
+	And (a=jump, b=Cinstruction, out=PCload);  // jump only if this a C instruction
+	Not (in=PCload, out=incflag);  // if no jump then inc to the next instruction
+	PC (in=Aregout, load=PCload, inc=incflag, reset=reset, out[0..14]=pc);
+}
